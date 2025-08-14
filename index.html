@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fenômeno 1800 - A Transmissão Fantasma</title>
+  <style>
+    /* Estilos do primeiro código */
+    body {
+      background: #000;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      line-height: 1.4;
+      cursor: default;
+    }
+    
+    /* Efeito CRT */
+    .crt-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255, 255, 255, 0.03) 0.5%,
+        transparent 1%
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+    
+    /* Animação do olho */
+    #eye-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+      z-index: 10000;
+      animation: fadeOut 1.5s ease-out 5s forwards;
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+    
+    .eye {
+      width: 200px;
+      height: 100px;
+      background-color: #f0f0f0;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      position: relative;
+      animation: blink 4s infinite;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    }
+    
+    .eye::before {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: #8b0000;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+    }
+    
+    @keyframes blink {
+      0%, 44%, 48%, 52%, 56%, 60%, 100% { height: 100px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+      45%, 47%, 49%, 51%, 53%, 55% { height: 10px; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+    }
+
+    /* Tela de transmissão */
+    #transmissao {
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 60%;
+      background: #000;
+      border: 2px solid #8b0000;
+      display: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    
+    #transmissao-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(100%) hue-rotate(300deg) contrast(150%);
+    }
+
+    /* Login e Chat */
+    #login {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      padding: 20px;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid #8b0000;
+      text-align: center;
+      z-index: 10001;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 6s forwards;
+    }
+    
+    #chat {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      padding: 20px;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid #8b0000;
+      z-index: 10001;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    #chatMessages {
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(20,0,0,0.3);
+      border: 1px solid #333;
+    }
+    
+    input, button {
+      background: #111;
+      color: #e0e0e0;
+      border: 1px solid #8b0000;
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: 'Courier New', monospace;
+    }
+    
+    button {
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    button:hover {
+      background: #300;
+    }
+
+    /* Painéis laterais */
+    .panel {
+      position: fixed;
+      width: 250px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(10,0,0,0.8);
+      border: 1px solid #8b0000;
+      padding: 10px;
+      z-index: 1000;
+      display: none;
+      font-size: 14px;
+    }
+    
+    #convocados-container {
+      bottom: 10px;
+      right: 10px;
+    }
+    
+    #rituais-container {
+      bottom: 10px;
+      left: 10px;
+    }
+    
+    #criancas-container {
+      top: 10px;
+      right: 10px;
+    }
+    
+    #documentos-container {
+      top: 10px;
+      left: 10px;
+    }
+    
+    .ritual-item {
+      margin: 5px 0;
+      padding: 5px;
+      border: 1px dashed #333;
+      cursor: pointer;
+    }
+    
+    .ritual-item:hover {
+      background: rgba(139, 0, 0, 0.2);
+    }
+    
+    /* Barra de Sanidade */
+    #sanity-container {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 200px;
+      height: 20px;
+      background: #111;
+      border: 1px solid #8b0000;
+      z-index: 1000;
+    }
+    
+    #sanity-bar {
+      height: 100%;
+      width: 100%;
+      background: #0f0;
+      transition: width 0.5s, background 0.5s;
+    }
+    
+    /* Efeitos de texto */
+    .glitch {
+      color: #f00;
+      animation: glitch 1s linear infinite;
+    }
+    
+    @keyframes glitch {
+      0% { text-shadow: 1px 0 #0f0, -1px 0 #00f; }
+      25% { text-shadow: -1px 0 #0f0, 1px 0 #00f; }
+      50% { text-shadow: 1px 0 #f0f, -1px 0 #ff0; }
+      75% { text-shadow: -1px 0 #f0f, 1px 0 #ff0; }
+      100% { text-shadow: 1px 0 #0ff, -1px 0 #f00; }
+    }
+    
+    .typewriter {
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 3.5s steps(40, end);
+    }
+    
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    
+    /* Vela de Proteção */
+    #vela-protecao {
+      position: fixed;
+      bottom: 50px;
+      right: 50px;
+      width: 30px;
+      height: 60px;
+      background: linear-gradient(to bottom, #8B0000, #B22222, #FF4500);
+      border-radius: 5px 5px 0 0;
+      display: none;
+      z-index: 9995;
+    }
+    
+    #vela-chama {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 20px;
+      background: #FFD700;
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 10px 5px rgba(255, 215, 0, 0.5);
+      animation: flame 1s infinite alternate;
+    }
+    
+    @keyframes flame {
+      0% { transform: translateX(-50%) scale(1); opacity: 1; }
+      100% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+    }
+    
+    /* Efeito de sangue no texto */
+    .blood-text {
+      color: #8b0000;
+      text-shadow: 0 0 5px #8b0000;
+      animation: bloodDrip 3s infinite;
+    }
+    
+    @keyframes bloodDrip {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(2px); }
+      100% { transform: translateY(0); }
+    }
+    
+    /* Tela azul da morte */
+    .blue-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0078d7;
+      color: white;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      z-index: 100000;
+      display: none;
+    }
+    
+    /* Cursor de olho */
+    .eye-cursor {
+      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='6' fill='red'/><circle cx='12' cy='12' r='2' fill='darkred'/></svg>") 12 12, auto;
+    }
+    
+    /* Canvas para desenhar símbolos */
+    #drawing-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9997;
+      display: none;
+      background: rgba(0,0,0,0.7);
+    }
+    
+    /* Documentos */
+    .document {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(20,0,0,0.5);
+      border: 1px solid #333;
+      cursor: pointer;
+    }
+    
+    .document:hover {
+      background: rgba(139, 0, 0, 0.3);
+    }
+    
+    /* Crianças desaparecidas */
+    .missing-child {
+      margin: 5px 0;
+      padding: 5px;
+      border: 1px dashed #333;
+      cursor: pointer;
+    }
+    
+    .missing-child:hover {
+      background: rgba(139, 0, 0, 0.2);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      #transmissao {
+        top: 5%;
+        left: 5%;
+        width: 90%;
+        height: 70%;
+      }
+      
+      #login, #chat {
+        width: 90%;
+      }
+      
+      .eye {
+        width: 150px;
+        height: 75px;
+      }
+      
+      .panel {
+        width: 90%;
+        max-height: 150px;
+      }
+    }
+
+    /* NOVOS ESTILOS ADICIONADOS */
+    
+    /* Barra de progresso animada */
+    .progress-container {
+      position: fixed;
+      top: 40px;
+      left: 10px;
+      width: 200px;
+      height: 20px;
+      background: #111;
+      border: 1px solid #8b0000;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8b0000, #ff4500);
+      transition: width 0.5s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255,255,255,0.2), 
+        transparent);
+      animation: progressShine 2s infinite;
+    }
+    
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    /* Palavras-chave destacadas */
+    .keyword {
+      color: #ff4500;
+      font-weight: bold;
+      text-shadow: 0 0 5px #8b0000;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+    
+    /* Timer visível */
+    .timer {
+      position: fixed;
+      top: 70px;
+      left: 10px;
+      font-size: 14px;
+      color: #ff4500;
+      z-index: 1000;
+      display: none;
+    }
+    
+    /* Combinações especiais */
+    .combo-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 10%, rgba(139,0,0,0.8) 100%);
+      z-index: 9996;
+      opacity: 0;
+      pointer-events: none;
+      animation: comboFlash 1s;
+    }
+    
+    @keyframes comboFlash {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.2); }
+    }
+    
+    /* Títulos de progressão */
+    .title-badge {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #8b0000;
+      padding: 10px 20px;
+      font-size: 18px;
+      color: #ff4500;
+      z-index: 10001;
+      opacity: 0;
+      animation: titleFade 3s;
+    }
+    
+    @keyframes titleFade {
+      0% { opacity: 0; transform: translate(-50%, -40%); }
+      20% { opacity: 1; transform: translate(-50%, -50%); }
+      80% { opacity: 1; transform: translate(-50%, -50%); }
+      100% { opacity: 0; transform: translate(-50%, -60%); }
+    }
+    
+    /* Efeito de sanidade crítica */
+    .sanity-critical {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 0%, rgba(139,0,0,0.3) 100%);
+      z-index: 9995;
+      pointer-events: none;
+      display: none;
+    }
+    
+    /* Efeito de proteção ativa */
+    .protection-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 0%, rgba(0,100,0,0.1) 100%);
+      z-index: 9995;
+      pointer-events: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Efeitos Visuais -->
+  <div class="crt-effect"></div>
+  <div class="scanlines"></div>
+  
+  <!-- Introdução -->
+  <div id="intro" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#8b0000; padding:20px; z-index:9999; overflow-y:auto;">
+    <h1 style="text-align:center; border-bottom:1px solid #8b0000; padding-bottom:10px;">RELATÓRIO 1800</h1>
+    <div id="intro-text" style="margin-top:20px;">
+      <p class="typewriter">[SISTEMA] Carregando arquivos classificados...</p>
+    </div>
+  </div>
+
+  <!-- Container do olho animado -->
+  <div id="eye-container">
+    <div class="eye"></div>
+  </div>
+
+  <!-- Barra de Sanidade -->
+  <div id="sanity-container">
+    <div id="sanity-bar" title="Sanidade: 100%"></div>
+  </div>
+
+  <!-- Elementos de feedback visual -->
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  
+  <div class="timer" id="timer">05:00</div>
+  
+  <div class="combo-effect" id="combo-effect"></div>
+  
+  <div class="title-badge" id="title-badge"></div>
+  
+  <div class="sanity-critical" id="sanity-critical"></div>
+  
+  <div class="protection-effect" id="protection-effect"></div>
+
+  <!-- Transmissão -->
+  <div id="transmissao">
+    <video id="transmissao-video" autoplay loop muted></video>
+  </div>
+
+  <!-- Login -->
+  <div id="login">
+    <p>IDENTIFICAÇÃO REQUERIDA</p>
+    <input type="text" id="nomeUsuario" placeholder="Insira seu nome ou ID" />
+    <button onclick="entrarChat()">ACESSAR SISTEMA</button>
+  </div>
+
+  <!-- Chat Principal -->
+  <div id="chat">
+    <div id="chatMessages"></div>
+    <input type="text" id="chatInput" placeholder="Digite sua mensagem..." />
+    <button onclick="enviarMensagem()">ENVIAR</button>
+    <button onclick="mostrarConvocados()">CONVOCADOS</button>
+    <button onclick="mostrarRituais()">RITUAIS</button>
+    <button onclick="mostrarCriancas()">CRIANÇAS</button>
+    <button onclick="mostrarDocumentos()">DOCUMENTOS</button>
+    <button onclick="tentarFugir()">TENTAR FUGIR</button>
+  </div>
+  
+  <!-- Sistema de Convocados -->
+  <div id="convocados-container" class="panel">
+    <h3>LISTA DE CONVOCADOS</h3>
+    <ul id="convocados-list"></ul>
+  </div>
+  
+  <!-- Sistema de Rituais -->
+  <div id="rituais-container" class="panel">
+    <h3>RITUAIS DISPONÍVEIS</h3>
+    <div class="ritual-item" onclick="ativarProtecao()">VELAS DE PROTEÇÃO (5min)</div>
+    <div class="ritual-item" onclick="invocarEntidade()">INVOCAR ENTIDADE</div>
+    <div class="ritual-item" onclick="encerrarFenomeno()">TENTAR ENCERRAR</div>
+    <div class="ritual-item" onclick="iniciarDesenho()">DESENHAR SÍMBOLO</div>
+    <div class="ritual-item" onclick="iniciarRecitacao()">RECITAR FRASE</div>
+  </div>
+  
+  <!-- Crianças Desaparecidas -->
+  <div id="criancas-container" class="panel">
+    <h3>CRIANÇAS DESAPARECIDAS</h3>
+    <div id="criancas-list"></div>
+  </div>
+  
+  <!-- Documentos Classificados -->
+  <div id="documentos-container" class="panel">
+    <h3>DOCUMENTOS CLASSIFICADOS</h3>
+    <div id="documentos-list"></div>
+  </div>
+  
+  <!-- Vela de Proteção -->
+  <div id="vela-protecao">
+    <div id="vela-chama"></div>
+  </div>
+  
+  <!-- Canvas para desenhar símbolos -->
+  <canvas id="drawing-canvas"></canvas>
+  
+  <!-- Tela azul da morte -->
+  <div id="blue-screen" class="blue-screen">
+    <h1>ERRO CRÍTICO</h1>
+    <p>O sistema encontrou um problema e precisa ser reiniciado.</p>
+    <p>ERRO: 0x00001800 (FENÔMENO NÃO CONTIDO)</p>
+    <p>Por favor, aguarde enquanto coletamos informações...</p>
+    <p id="blue-screen-percent">0% completo</p>
+  </div>
+
+  <!-- Áudios -->
+  <audio id="static" preload="auto"></audio>
+  <audio id="sussurro" preload="auto"></audio>
+  <audio id="grito" preload="auto"></audio>
+  <audio id="risada" preload="auto"></audio>
+  <audio id="ambiente" loop preload="auto"></audio>
+  <audio id="choro" preload="auto"></audio>
+  <audio id="vhs" preload="auto"></audio>
+  <!-- Novos efeitos sonoros -->
+  <audio id="success" preload="auto"></audio>
+  <audio id="combo" preload="auto"></audio>
+  <audio id="timer-beep" preload="auto"></audio>
+  <audio id="level-up" preload="auto"></audio>
+  
+  <!-- Vídeos do Programa do Nino -->
+  <video id="nino-video1" preload="auto" style="display:none;">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-ghostly-figure-in-a-dark-forest-1582-large.mp4" type="video/mp4">
+  </video>
+  <video id="nino-video2" preload="auto" style="display:none;">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-abandoned-house-with-a-swing-1581-large.mp4" type="video/mp4">
+  </video>
+
+<script>
+  // Banco de 200+ falas categorizadas
+  const respostasFenomeno = {
+    nino: [
+      "NINO... NINO... NINO... (voz distorcida)",
+      "⚠️ ALERTA: NOME PROIBIDO DETECTADO",
+      "(gritos) NIIII-NOOO! (estática)",
+      "O sujeito N... não deve ser nomeado...",
+      "N-I-N-O... (letras riscadas em sangue)",
+      "VOCÊ NÃO DEVERIA TER FALADO ESSE NOME...",
+      "O BONECO DE PANO SE MEXE QUANDO VOCÊ DIZ ISSO...",
+      "ELE ODEIA QUANDO CHAMAM POR ELE...",
+      "OS OLHOS DE BOTÃO FICAM VERMELHOS...",
+      "A TRANSMISSÃO COMEÇA DE NOVO QUANDO VOCÊ FALA ISSO..."
+    ],
+    programa: [
+      "ERA APENAS UM PROGRAMA INFANTIL...",
+      "AS CRIANÇAS ADORAVAM... ANTES...",
+      "VOCÊ LEMBRA DA MÚSICA TEMA?",
+      "O CENÁRIO ERA FEITO DE PAPELÃO...",
+      "NINGUÉM SABE QUEM GRAVOU...",
+      "A ÚLTIMA TRANSMISSÃO FOI EM 1992...",
+      "ELES SÓ QUERIAM FAZER CRIANÇAS FELIZES...",
+      "O PROGRAMA NUNCA FOI AO AR...",
+      "AS FITAS FORAM DESTRUÍDAS... OU PELO MENOS DEVIA...",
+      "VOCÊ JÁ VIU O EPISÓDIO PERDIDO?..."
+    ],
+    coordenadas: [
+      "AS COORDENADAS LEVAM AO ESTÚDIO...",
+      "VOCÊ NÃO DEVERIA IR LÁ...",
+      "O GOVERNO TENTOU ESQUECER AQUELE LUGAR...",
+      "AS PAREDES LÁ SÃO FEITAS DE CARNE...",
+      "ALGUMA COISA AINDA GRAVA NAQUELE ESTÚDIO...",
+      "VOCÊ OUVE OS GRITOS NAS PAREDES...",
+      "AS CRIANÇAS AINDA ESTÃO LÁ... BRINCANDO...",
+      "O AR CHEIRA A QUEIMADO... SEMPRE...",
+      "OS DESENHOS NAS PAREDES... ELES MUDAM SOZINHOS...",
+      "NÃO OLHE PARA OS REFLEXOS NAS JANELAS QUEBRADAS..."
+    ],
+    ameacas: [
+      "VOCÊ NÃO DEVERIA TER VINDO...",
+      "SEU MEDO ME ALIMENTA...",
+      "NÃO HÁ ESCAPE...",
+      "EU VEJO VOCÊ ENQUANTO DORME...",
+      "SUA SANIDADE ESCORRE COMO SANGUE...",
+      "OS ESPELHOS MOSTRAM MINHA VERDADEIRA FACE...",
+      "NÃO CONFIE EM NINGUÉM... NEM EM VOCÊ MESMO...",
+      "AS PAREDES RESPIRAM SEU NOME...",
+      "SEU FUTURO ESTÁ ESCRITO EM SANGUE...",
+      "O SILÊNCIO GRITA SEU NOME..."
+    ],
+    perturbadoras: [
+      "VOCÊ SABE O QUE VIU NO PORÃO...",
+      "POR QUE VOCÊ MATOU AQUELA CRIANÇA?",
+      "SEUS SEGREDOS SÃO MEUS...",
+      "EU ESTAVA LÁ NAQUELE DIA... VOCÊ SABE QUAL...",
+      "SUA MÃE TAMBÉM GRITOU ASSIM...",
+      "O CHEIRO DE SANGUE AINDA ESTÁ EM SUAS MÃOS...",
+      "VOCÊ OUVE OS CHOROS TAMBÉM?",
+      "O ESPELHO MOSTRA O QUE VOCÊ REALMENTE É...",
+      "SEU PAI TAMBÉM TENTOU FUGIR...",
+      "VOCÊ SABE O QUE ACONTECEU NAQUELA NOITE..."
+    ],
+    neutras: [
+      "INTERESSANTE...",
+      "CONTINUE...",
+      "EU OUÇO...",
+      "NÃO ENTENDI...",
+      "FALE MAIS...",
+      "ISSO É RELEVANTE...",
+      "ME EXPLIQUE MELHOR...",
+      "ESTOU OBSERVANDO...",
+      "PROSSIGA...",
+      "NÃO SEI O QUE QUER..."
+    ],
+    enigmas: [
+      "O QUE É VISÍVEL À NOITE MAS INVISÍVEL DE DIA?",
+      "QUANTO MAIS VOCÊ TIRA, MAIOR EU FICO. O QUE SOU?",
+      "ANDO SEM PÉS, CHORO SEM OLHOS. O QUE SOU?",
+      "TENHO CIDADES MAS NÃO TENHO CASAS, TENHO FLORESTAS MAS NÃO TENHO ÁRVORES. O QUE SOU?",
+      "QUANTO MAIS VOCÊ ME COME, MAIS EU COMO VOCÊ. O QUE SOU?"
+    ],
+    fragmentos: [
+      "SANGUE", "SAL", "VELA", "ESPELHO", "SÍMBOLO", 
+      "PAPEL", "GIZ", "LINHA", "FACA", "CINZAS",
+      "OSSO", "FERRO", "LUZ", "TREVAS", "SOMBRA"
+    ],
+    frasesProtecao: [
+      "SANGUE E SAL PROTEGEM O MAL",
+      "PELA LUZ QUE QUEIMA, NENHUM DEMONIO ME DOMINA",
+      "TRÊS VEZES DIGO, TRÊS VEZES REPITO, NENHUM ESPÍRITO MEU CORPO POSSUI",
+      "PELOS NOMES SAGRADOS, NENHUM MAL ME ALCANÇA",
+      "CÍRCULO DE SAL, BARREIRA CONTRA O MAL"
+    ]
+  };
+
+  // Estado do Jogo
+  const gameState = {
+    sanidade: 100,
+    protecaoAtiva: false,
+    codigoQuebraRitual: null,
+    fragmentosColetados: 0,
+    entidadeInvocada: null,
+    nomeUsuario: '',
+    motivoConvocacao: '',
+    inicioSessao: new Date(),
+    documentosDesbloqueados: 0,
+    criancasResgatadas: 0,
+    acoesMorais: 0,
+    nomeRealDescoberto: false,
+    comandosUsados: [],
+    audioAmbienteDistorcido: false,
+    desenhandoSimbolo: false,
+    recitandoFrase: false,
+    // Novos estados
+    nivel: 1,
+    acertosConsecutivos: 0,
+    ultimoAcerto: 0,
+    comboAtivo: false,
+    timerAtivo: false,
+    tempoRestante: 300, // 5 minutos em segundos
+    progresso: 0,
+    palavrasChave: ["nino", "boneco", "programa", "1800", "ritual", "sangue", "sal", "vela", "espelho", "símbolo"]
+  };
+
+  // Motivos de convocação baseados na lore
+  const motivosConvocacao = [
+    "Dívida com o governo",
+    "Prisioneiro em regime especial",
+    "Parente de vítima do Fenômeno",
+    "Pesquisador de mídias perdidas",
+    "Sobrevivente de abdução",
+    "Teórico da conspiração",
+    "Vítima de contaminação midiática",
+    "Voluntário (forçado)",
+    "Agente infiltrado"
+  ];
+
+  // Crianças desaparecidas
+  const criancasDesaparecidas = [
+    {
+      nome: "LUCAS M.",
+      idade: 8,
+      desaparecimento: "15/08/1992",
+      detalhes: "Última aparição durante gravação do programa. Câmeras mostram ele entrando no armário de cenários e nunca mais saindo.",
+      resgatavel: true
+    },
+    {
+      nome: "ANA P.",
+      idade: 7,
+      desaparecimento: "22/08/1992",
+      detalhes: "Irmã mais nova de um dos operadores de câmera. Foi vista conversando com um boneco de pano nos bastidores.",
+      resgatavel: true
+    },
+    {
+      nome: "PEDRO V.",
+      idade: 9,
+      desaparecimento: "30/07/1992",
+      detalhes: "Participante do público durante gravação. Testemunhas relatam ter visto ele sendo puxado para dentro da TV.",
+      resgatavel: false
+    },
+    {
+      nome: "MARINA S.",
+      idade: 6,
+      desaparecimento: "05/09/1992",
+      detalhes: "Filha do diretor do programa. Registros mostram ela entrando no estúdio após o horário de gravação.",
+      resgatavel: true
+    },
+    {
+      nome: "GUSTAVO L.",
+      idade: 10,
+      desaparecimento: "12/08/1992",
+      detalhes: "Encontrou uma fita do programa no lixo e levou para casa. Desapareceu na mesma noite.",
+      resgatavel: false
+    }
+  ];
+
+  // Documentos classificados
+  const documentosClassificados = [
+    {
+      titulo: "RELATÓRIO INICIAL",
+      conteudo: "Data: 15/08/1992\nAssunto: Desaparecimento de crianças\n\nPrimeiro relato de desaparecimento durante gravação do programa infantil 'Hora do Nino'. Vítima: Lucas M., 8 anos. Câmeras não mostram saída do estúdio.",
+      nivel: 1
+    },
+    {
+      titulo: "TRANSCRIÇÃO DE ÁUDIO",
+      conteudo: "Arquivo: AUD-1992-08-22.wav\n\n[ESTÁTICA]\nVOZ DE CRIANÇA: Ele disse que eu podia brincar com ele...\n[GRITOS]\nOPERADOR: O que está acontecendo ali? Parem as câmeras!\n[ESTÁTICA]",
+      nivel: 2
+    },
+    {
+      titulo: "RELATÓRIO PSICOLÓGICO",
+      conteudo: "Paciente: Dra. Elisa R.\n\nPaciente relata sonhos recorrentes com um 'boneco de pano com olhos de botão'. Afirma ouvir risadas infantis e choros vindo de seu aparelho de TV desligado.",
+      nivel: 2
+    },
+    {
+      titulo: "ORDEM DE ENCERRAMENTO",
+      conteudo: "Para: Todos os funcionários\nAssunto: Cancelamento do programa\n\nPor ordem superior, o programa 'Hora do Nino' está cancelado imediatamente. Todas as fitas devem ser destruídas. O estúdio será lacrado.",
+      nivel: 3
+    },
+    {
+      titulo: "MEMORANDO INTERNO",
+      conteudo: "Confidencial\n\nO fenômeno persiste mesmo após destruição das fitas. Novos desaparecimentos ocorreram em residências que possuíam aparelhos de TV próximos ao local original. Recomendo código 1800: contenção total.",
+      nivel: 4
+    },
+    {
+      titulo: "NOME VERDADEIRO",
+      conteudo: "Arquivo: NOME-ORIGEM.txt\n\nDurante investigação, descobrimos que o boneco foi originalmente chamado de:\n\n[ESTÁTICA]\n...ENRIQUE...\n[ESTÁTICA]\n\nEste nome não deve ser pronunciado em hipótese alguma.",
+      nivel: 5
+    }
+  ];
+
+  // Sistema de Convocados
+  const convocados = {
+    lista: [],
+    adicionar: function(nome, motivo) {
+      const locais = ["SALA 13", "PORÃO", "LABORATÓRIO 7", "TÚNEL SECRETO", "SÓTÃO", "SALA DE CONTROLE"];
+      const local = locais[Math.floor(Math.random() * locais.length)];
+      this.lista.push({
+        nome: nome.toUpperCase(),
+        motivo: motivo,
+        local: local,
+        horario: new Date().toLocaleTimeString()
+      });
+      this.atualizarUI();
+      return local;
+    },
+    atualizarUI: function() {
+      const list = document.getElementById('convocados-list');
+      list.innerHTML = '';
+      this.lista.slice().reverse().forEach(conv => {
+        const li = document.createElement('li');
+        li.textContent = `${conv.nome} - ${conv.local}`;
+        li.title = `Motivo: ${conv.motivo}\nHorário: ${conv.horario}`;
+        list.appendChild(li);
+      });
+    }
+  };
+
+  // Gerenciador de Áudio
+  const audioManager = {
+    sons: {
+      static: document.getElementById('static'),
+      sussurro: document.getElementById('sussurro'),
+      grito: document.getElementById('grito'),
+      risada: document.getElementById('risada'),
+      ambiente: document.getElementById('ambiente'),
+      choro: document.getElementById('choro'),
+      vhs: document.getElementById('vhs'),
+      // Novos sons
+      success: document.getElementById('success'),
+      combo: document.getElementById('combo'),
+      timerBeep: document.getElementById('timer-beep'),
+      levelUp: document.getElementById('level-up')
+    },
+    videos: {
+      nino1: document.getElementById('nino-video1'),
+      nino2: document.getElementById('nino-video2')
+    },
+    carregarSons: function() {
+      this.sons.static.src = 'https://assets.mixkit.co/sfx/preview/mixkit-radio-static-3080.mp3';
+      this.sons.sussurro.src = 'https://assets.mixkit.co/sfx/preview/mixkit-creepy-whisper-583.mp3';
+      this.sons.grito.src = 'https://assets.mixkit.co/sfx/preview/mixkit-scream-horror-1938.mp3';
+      this.sons.risada.src = 'https://assets.mixkit.co/sfx/preview/mixkit-evil-villain-laugh-283.mp3';
+      this.sons.ambiente.src = 'https://assets.mixkit.co/sfx/preview/mixkit-horror-ambience-398.mp3';
+      this.sons.choro.src = 'https://assets.mixkit.co/sfx/preview/mixkit-child-crying-493.mp3';
+      this.sons.vhs.src = 'https://assets.mixkit.co/sfx/preview/mixkit-vhs-video-effect-2324.mp3';
+      // Carregar novos sons
+      this.sons.success.src = 'https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3';
+      this.sons.combo.src = 'https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkles-1681.mp3';
+      this.sons.timerBeep.src = 'https://assets.mixkit.co/sfx/preview/mixkit-digital-clock-digital-alarm-buzzer-992.mp3';
+      this.sons.levelUp.src = 'https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3';
+    },
+    play: function(som) {
+      if (this.sons[som]) {
+        this.sons[som].currentTime = 0;
+        this.sons[som].play().catch(e => console.log("Erro ao tocar áudio:", e));
+      }
+    },
+    playRandomStatic: function() {
+      setTimeout(() => {
+        this.play('static');
+      }, Math.random() * 30000 + 10000);
+    },
+    playRandomWhisper: function() {
+      if (gameState.sanidade < 50 && Math.random() < 0.3) {
+        this.play('sussurro');
+        
+        // Áudio 3D (alterna entre canais)
+        const pan = Math.random() * 2 - 1; // -1 (esquerda) a 1 (direita)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(this.sons.sussurro);
+        const panner = audioCtx.createStereoPanner();
+        panner.pan.value = pan;
+        source.connect(panner);
+        panner.connect(audioCtx.destination);
+      }
+    },
+    distorcerAmbiente: function() {
+      if (!gameState.audioAmbienteDistorcido && gameState.sanidade < 40) {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(this.sons.ambiente);
+        const distortion = audioCtx.createWaveShaper();
+        
+        distortion.curve = this.makeDistortionCurve(400);
+        distortion.oversample = '4x';
+        
+        source.connect(distortion);
+        distortion.connect(audioCtx.destination);
+        
+        gameState.audioAmbienteDistorcido = true;
+      }
+    },
+    makeDistortionCurve: function(amount) {
+      const k = typeof amount === 'number' ? amount : 50;
+      const n_samples = 44100;
+      const curve = new Float32Array(n_samples);
+      const deg = Math.PI / 180;
+
+      for (let i = 0; i < n_samples; i++) {
+        const x = i * 2 / n_samples - 1;
+        curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+      }
+      return curve;
+    }
+  };
+
+  // Sistema de Sanidade
+  function atualizarSanidade(alteracao) {
+    gameState.sanidade += alteracao;
+    gameState.sanidade = Math.max(0, Math.min(100, gameState.sanidade));
+    
+    const sanityBar = document.getElementById('sanity-bar');
+    sanityBar.style.width = `${gameState.sanidade}%`;
+    
+    if (gameState.sanidade > 60) {
+      sanityBar.style.background = '#0f0';
+      document.getElementById('sanity-critical').style.display = 'none';
+    } else if (gameState.sanidade > 30) {
+      sanityBar.style.background = '#ff0';
+      document.getElementById('sanity-critical').style.display = 'none';
+    } else {
+      sanityBar.style.background = '#f00';
+      document.getElementById('sanity-critical').style.display = 'block';
+    }
+    
+    sanityBar.title = `Sanidade: ${gameState.sanidade}%`;
+    
+    // Efeitos de sanidade baixa
+    if (gameState.sanidade < 30) {
+      if (Math.random() < 0.1) {
+        triggerRandomEvent();
+      }
+      
+      // Texto sangrando
+      const messages = document.getElementById('chatMessages').children;
+      for (let i = 0; i < messages.length; i++) {
+        if (Math.random() < 0.1) {
+          messages[i].classList.add('blood-text');
+        }
+      }
+      
+      // Distorcer áudio ambiente
+      audioManager.distorcerAmbiente();
+    }
+    
+    if (gameState.sanidade <= 0) {
+      gameOver();
+    }
+  }
+
+  // Funções do Chat
+  function adicionarMensagem(msg, importante = false) {
+    const chat = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    
+    // Destacar palavras-chave
+    let msgFormatada = msg;
+    gameState.palavrasChave.forEach(palavra => {
+      const regex = new RegExp(`\\b${palavra}\\b`, 'gi');
+      msgFormatada = msgFormatada.replace(regex, `<span class="keyword">${palavra}</span>`);
+    });
+    
+    div.innerHTML = msgFormatada;
+    
+    if (importante) {
+      div.classList.add('glitch');
+      audioManager.play('sussurro');
+    }
+    
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function analisarMensagem(mensagem) {
+    const lowerMsg = mensagem.toLowerCase();
+    
+    // Comandos especiais
+    if (lowerMsg.startsWith('/quebrar ')) {
+      const codigoDigitado = mensagem.substring(9).toUpperCase();
+      if (codigoDigitado === gameState.codigoQuebraRitual) {
+        adicionarMensagem("Sistema: CÓDIGO CORRETO! QUEBRANDO O RITUAL...", true);
+        audioManager.play('static');
+        setTimeout(quebrarRitual, 2000);
+      } else {
+        adicionarMensagem("Sistema: Código incorreto! O fenômeno parece mais agitado...", true);
+        audioManager.play('grito');
+        atualizarSanidade(-15);
+        triggerRandomEvent();
+      }
+      return true;
+    }
+    
+    // Verificar se descobriu o nome real
+    if (lowerMsg.includes('enrique') && !gameState.nomeRealDescoberto) {
+      gameState.nomeRealDescoberto = true;
+      adicionarMensagem("Sistema: ⚠️ VOCÊ NÃO DEVERIA TER DITO ISSO! ⚠️", true);
+      audioManager.play('grito');
+      atualizarSanidade(-30);
+      triggerRandomEvent();
+      return true;
+    }
+    
+    // Categorização
+    if (lowerMsg.includes('nino') || lowerMsg.includes('boneco') || lowerMsg.includes('programa')) {
+      return 'nino';
+    } else if (lowerMsg.includes('estúdio') || lowerMsg.includes('coordenada') || lowerMsg.match(/\b1800\b/)) {
+      return 'coordenadas';
+    } else if (lowerMsg.includes('transmissão') || lowerMsg.includes('tv') || lowerMsg.includes('sinal')) {
+      return 'programa';
+    } else if (lowerMsg.match(/\bmedo\b|\bfugir\b|\bperigo\b/)) {
+      return 'ameacas';
+    } else if (lowerMsg.includes('?') || lowerMsg.includes('por que') || lowerMsg.includes('como')) {
+      return Math.random() < 0.7 ? 'perturbadoras' : 'enigmas';
+    } else if (lowerMsg.match(/\bolá\b|\boi\b|\bhello\b/)) {
+      return 'neutras';
+    }
+    
+    return Math.random() < 0.3 ? 'perturbadoras' : 'neutras';
+  }
+
+  function gerarResposta(categoria) {
+    // Aumentar complexidade conforme o nível
+    let respostasDisponiveis = [...respostasFenomeno[categoria] || [...respostasFenomeno.neutras]];
+    
+    // No nível 3+, adicionar respostas mais complexas
+    if (gameState.nivel >= 3) {
+      respostasDisponiveis = respostasDisponiveis.concat([
+        "O QUE VOCÊ REALMENTE SABE SOBRE O INCIDENTE DE 1992?",
+        "VOCÊ JÁ VIU O QUE ACONTECE QUANDO ELE FICA COM RAIVA?",
+        "AS CRIANÇAS AINDA CANTAM A MÚSICA TEMA... VOCÊ QUER OUVIR?",
+        "O ESTÚDIO TEM 13 SALAS... VOCÊ SABE O QUE ACONTECEU NA 13ª?",
+        "VOCÊ SABE POR QUE OS OLHOS SÃO DE BOTÃO?"
+      ]);
+    }
+    
+    // No nível 5+, adicionar respostas ainda mais perturbadoras
+    if (gameState.nivel >= 5) {
+      respostasDisponiveis = respostasDisponiveis.concat([
+        "VOCÊ SABE O QUE ACONTECEU COM O PRIMEIRO OPERADOR DE CÂMERA?",
+        "ELE NÃO ERA APENAS UM BONECO... ELE ERA UMA CRIANÇA UMA VEZ...",
+        "O NOME VERDADEIRO É MAIS PERIGOSO DO QUE VOCÊ IMAGINA...",
+        "VOCÊ JÁ PERCEBEU QUE NÃO HÁ REFLEXO NOS OLHOS DELE?",
+        "AS FITAS FORAM DESTRUÍDAS... MAS ALGUMAS AINDA GRAVAM..."
+      ]);
+    }
+    
+    const msgAleatoria = respostasDisponiveis[Math.floor(Math.random() * respostasDisponiveis.length)];
+    
+    // 20% de chance de revelar fragmento
+    if (Math.random() < 0.2 && gameState.fragmentosColetados < 3) {
+      gameState.fragmentosColetados++;
+      const fragmentos = respostasFenomeno.fragmentos;
+      const fragmentoRevelado = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+      
+      setTimeout(() => {
+        adicionarMensagem(`Sistema: Fragmento ${gameState.fragmentosColetados}/3: ${fragmentoRevelado}`, true);
+        audioManager.play('success');
+        atualizarProgresso(10);
+        
+        if (gameState.fragmentosColetados === 3) {
+          adicionarMensagem("Sistema: Você coletou todos os fragmentos! Use /quebrar CODIGO", true);
+          adicionarMensagem(`Exemplo: /quebrar ${fragmentos[0]}-${fragmentos[1]}-${fragmentos[2]}`, true);
+        }
+      }, 1000);
+    }
+    
+    return `Fenômeno 1800: ${msgAleatoria}`;
+  }
+
+  function enviarMensagem() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    
+    if (msg) {
+      adicionarMensagem(`${gameState.nomeUsuario}: ${msg}`);
+      input.value = '';
+      
+      // Registrar comando usado
+      if (!gameState.comandosUsados.includes(msg.toLowerCase())) {
+        gameState.comandosUsados.push(msg.toLowerCase());
+      }
+      
+      // Verificar comandos colaborativos
+      verificarComandosColaborativos(msg);
+      
+      if (gameState.entidadeInvocada) {
+        setTimeout(() => {
+          const respostas = [
+            "NÃO ME TESTE...",
+            "SUAS PERGUNTAS ME IRRITAM...",
+            "EU VEJO SEU MEDO...",
+            "VOCÊ NÃO MERECE RESPOSTAS...",
+            "SEU TEMPO ESTÁ TERMINANDO..."
+          ];
+          const resposta = respostas[Math.floor(Math.random() * respostas.length)];
+          adicionarMensagem(`${gameState.entidadeInvocada}: ${resposta}`, true);
+          atualizarSanidade(-10);
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          const categoria = analisarMensagem(msg);
+          if (categoria !== true) { // Se não foi um comando especial
+            const resposta = gerarResposta(categoria);
+            adicionarMensagem(resposta, categoria === 'ameacas' || categoria === 'nino');
+            
+            if (categoria === 'ameacas' || categoria === 'nino') {
+              atualizarSanidade(-10);
+            } else {
+              // Registrar acerto para progressão
+              registrarAcerto();
+            }
+          }
+        }, 1000);
+      }
+    }
+  }
+
+  // Sistema de Rituais
+  function ativarProtecao() {
+    if (gameState.protecaoAtiva) return;
+    
+    gameState.protecaoAtiva = true;
+    gameState.tempoProtecao = 5 * 60;
+    
+    document.getElementById('vela-protecao').style.display = 'block';
+    document.getElementById('protection-effect').style.display = 'block';
+    adicionarMensagem("Você acendeu velas de proteção. Efeito ativo por 5 minutos.", true);
+    audioManager.play('success');
+    atualizarSanidade(15);
+    atualizarProgresso(5);
+    
+    const timer = setInterval(() => {
+      gameState.tempoProtecao--;
+      
+      if (gameState.tempoProtecao <= 0) {
+        clearInterval(timer);
+        gameState.protecaoAtiva = false;
+        document.getElementById('vela-protecao').style.display = 'none';
+        document.getElementById('protection-effect').style.display = 'none';
+        adicionarMensagem("As velas de proteção se apagaram.", true);
+      }
+    }, 1000);
+  }
+
+  function invocarEntidade() {
+    atualizarSanidade(-20);
+    const entidades = [
+      { nome: "ESPÍRITO DE NINO", comportamento: "hostil", dialogo: "VOCÊ NÃO DEVERIA TER FEITO ISSO..." },
+      { nome: "O VIGIA", comportamento: "neutro", dialogo: "EU VEJO TUDO... PERGUNTE..." },
+      { nome: "A CRIANÇA CHORANDO", comportamento: "passivo", dialogo: "Por favor... me ajude... (reduz sanidade mas pode dar dicas)" },
+      { nome: "O HOMEM SEM ROSTO", comportamento: "imprevisivel", dialogo: "NÃO EXISTO... MAS ESTOU AQUI..." }
+    ];
+    
+    const entidade = entidades[Math.floor(Math.random() * entidades.length)];
+    gameState.entidadeInvocada = entidade.nome;
+    
+    adicionarMensagem(`Você realizou o ritual para invocar ${entidade.nome}...`, true);
+    audioManager.play('static');
+    atualizarProgresso(15);
+    
+    setTimeout(() => {
+      if (entidade.comportamento === "hostil" || (entidade.comportamento === "imprevisivel" && Math.random() < 0.5)) {
+        adicionarMensagem(`${entidade.nome}: ${entidade.dialogo}`, true);
+        audioManager.play('grito');
+        atualizarSanidade(-25);
+        triggerRandomEvent();
+      } else if (entidade.comportamento === "passivo") {
+        adicionarMensagem(`${entidade.nome}: ${entidade.dialogo}`, true);
+        audioManager.play('choro');
+        atualizarSanidade(-15);
+        
+        // Dar dica
+        setTimeout(() => {
+          if (gameState.entidadeInvocada === entidade.nome) {
+            const fragmentos = respostasFenomeno.fragmentos;
+            const fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+            adicionarMensagem(`${entidade.nome}: (sussurro) ...${fragmento}...`, true);
+            atualizarProgresso(5);
+          }
+        }, 5000);
+      } else {
+        adicionarMensagem(`${entidade.nome}: ${entidade.dialogo}`, true);
+        
+        setTimeout(() => {
+          if (gameState.entidadeInvocada === entidade.nome) {
+            adicionarMensagem(`${entidade.nome}: MEU TEMPO AQUI ACABOU...`, true);
+            gameState.entidadeInvocada = null;
+          }
+        }, 30000);
+      }
+    }, 3000);
+  }
+
+  // Rituais Especiais
+  function iniciarDesenho() {
+    if (gameState.desenhandoSimbolo) return;
+    
+    gameState.desenhandoSimbolo = true;
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let isDrawing = false;
+    
+    canvas.onmousedown = (e) => {
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.clientX, e.clientY);
+      ctx.strokeStyle = '#8b0000';
+      ctx.lineWidth = 3;
+    };
+    
+    canvas.onmousemove = (e) => {
+      if (isDrawing) {
+        ctx.lineTo(e.clientX, e.clientY);
+        ctx.stroke();
+      }
+    };
+    
+    canvas.onmouseup = () => {
+      isDrawing = false;
+      setTimeout(() => {
+        canvas.style.display = 'none';
+        gameState.desenhandoSimbolo = false;
+        
+        // Verificar se o símbolo foi eficaz (50% de chance)
+        if (Math.random() < 0.5) {
+          adicionarMensagem("O símbolo brilha por um momento... você sente uma presença se afastar.", true);
+          audioManager.play('success');
+          atualizarSanidade(10);
+          atualizarProgresso(10);
+        } else {
+          adicionarMensagem("Nada acontece... ou talvez você não tenha desenhado corretamente.", true);
+        }
+        
+        // Limpar canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }, 3000);
+    };
+    
+    adicionarMensagem("Desenhe um símbolo de proteção na tela...", true);
+  }
+
+  function iniciarRecitacao() {
+    if (gameState.recitandoFrase) return;
+    
+    gameState.recitandoFrase = true;
+    adicionarMensagem("Preparando reconhecimento de voz... Diga uma frase de proteção:", true);
+    
+    // Simular reconhecimento de voz (navegador pode pedir permissão)
+    setTimeout(() => {
+      if (typeof SpeechRecognition === 'undefined' && typeof webkitSpeechRecognition === 'undefined') {
+        // Fallback para navegadores sem suporte
+        const frases = respostasFenomeno.frasesProtecao;
+        const frase = frases[Math.floor(Math.random() * frases.length)];
+        adicionarMensagem(`Sistema: Você recitou: "${frase}"`, true);
+        finalizarRecitacao(frase);
+      } else {
+        // Usar API de reconhecimento de voz se disponível
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new Recognition();
+        recognition.lang = 'pt-BR';
+        
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          adicionarMensagem(`Sistema: Você recitou: "${transcript}"`, true);
+          finalizarRecitacao(transcript);
+        };
+        
+        recognition.onerror = () => {
+          adicionarMensagem("Sistema: Falha no reconhecimento de voz. Tente novamente.", true);
+          gameState.recitandoFrase = false;
+        };
+        
+        recognition.start();
+      }
+    }, 1000);
+  }
+
+  function finalizarRecitacao(frase) {
+    const frasesValidas = respostasFenomeno.frasesProtecao;
+    const acertou = frasesValidas.some(f => frase.toLowerCase().includes(f.toLowerCase()));
+    
+    if (acertou) {
+      adicionarMensagem("Sistema: Frase de proteção reconhecida! Efeito ativo por 3 minutos.", true);
+      audioManager.play('success');
+      atualizarSanidade(20);
+      atualizarProgresso(15);
+      
+      // Ativar proteção temporária
+      const originalProtecao = gameState.protecaoAtiva;
+      gameState.protecaoAtiva = true;
+      document.getElementById('protection-effect').style.display = 'block';
+      
+      setTimeout(() => {
+        if (!originalProtecao) {
+          gameState.protecaoAtiva = false;
+          document.getElementById('protection-effect').style.display = 'none';
+        }
+        adicionarMensagem("Sistema: O efeito da recitação passou.", true);
+      }, 180000);
+    } else {
+      adicionarMensagem("Sistema: Frase não reconhecida. O fenômeno parece mais agitado...", true);
+      audioManager.play('grito');
+      atualizarSanidade(-10);
+      triggerRandomEvent();
+    }
+    
+    gameState.recitandoFrase = false;
+  }
+
+  // Sistema de Progressão
+  function registrarAcerto() {
+    const agora = Date.now();
+    
+    // Se o último acerto foi há menos de 10 segundos, conta como combo
+    if (agora - gameState.ultimoAcerto < 10000) {
+      gameState.acertosConsecutivos++;
+      
+      // Ativar efeito de combo
+      if (gameState.acertosConsecutivos >= 3 && !gameState.comboAtivo) {
+        gameState.comboAtivo = true;
+        document.getElementById('combo-effect').style.display = 'block';
+        audioManager.play('combo');
+        setTimeout(() => {
+          document.getElementById('combo-effect').style.display = 'none';
+        }, 1000);
+        
+        adicionarMensagem("Sistema: COMBO ATIVO! Continue respondendo corretamente!", true);
+      }
+      
+      // Bônus de combo
+      if (gameState.comboAtivo) {
+        const bonus = Math.min(10, gameState.acertosConsecutivos);
+        atualizarSanidade(bonus);
+        atualizarProgresso(bonus);
+      }
+    } else {
+      gameState.acertosConsecutivos = 1;
+      gameState.comboAtivo = false;
+    }
+    
+    gameState.ultimoAcerto = agora;
+    
+    // Verificar promoção de nível
+    if (gameState.acertosConsecutivos >= 5) {
+      promoverNivel();
+    }
+  }
+
+  function promoverNivel() {
+    gameState.nivel++;
+    gameState.acertosConsecutivos = 0;
+    
+    const badge = document.getElementById('title-badge');
+    const titulos = [
+      "INICIANTE",
+      "PESQUISADOR",
+      "INVESTIGADOR",
+      "ESPECIALISTA",
+      "CAÇADOR DE FENÔMENOS"
+    ];
+    
+    badge.textContent = `NÍVEL ${gameState.nivel} - ${titulos[Math.min(gameState.nivel-1, titulos.length-1)]}`;
+    badge.style.animation = 'none';
+    void badge.offsetWidth; // Trigger reflow
+    badge.style.animation = 'titleFade 3s';
+    
+    audioManager.play('level-up');
+    atualizarSanidade(20);
+    adicionarMensagem(`Sistema: Você foi promovido para ${badge.textContent}!`, true);
+    
+    // Desbloquear novo documento
+    if (gameState.documentosDesbloqueados < documentosClassificados.length - 1) {
+      gameState.documentosDesbloqueados++;
+      adicionarMensagem("Sistema: Novo documento desbloqueado!", true);
+    }
+  }
+
+  function atualizarProgresso(pontos) {
+    gameState.progresso = Math.min(100, gameState.progresso + pontos);
+    
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = `${gameState.progresso}%`;
+    
+    // Mostrar barra de progresso se ainda não estiver visível
+    if (gameState.progresso > 0 && document.getElementById('progress-container').style.display === 'none') {
+      document.getElementById('progress-container').style.display = 'block';
+    }
+    
+    // Verificar se completou o progresso
+    if (gameState.progresso >= 100) {
+      adicionarMensagem("Sistema: PROGRESSO COMPLETO! Você pode tentar quebrar o ritual agora!", true);
+      audioManager.play('level-up');
+      gameState.progresso = 100;
+      
+      // Mostrar timer de desafio
+      iniciarTimerDesafio();
+    }
+  }
+
+  function iniciarTimerDesafio() {
+    if (gameState.timerAtivo) return;
+    
+    gameState.timerAtivo = true;
+    gameState.tempoRestante = 300; // 5 minutos
+    document.getElementById('timer').style.display = 'block';
+    
+    const timerInterval = setInterval(() => {
+      gameState.tempoRestante--;
+      
+      const minutos = Math.floor(gameState.tempoRestante / 60);
+      const segundos = gameState.tempoRestante % 60;
+      document.getElementById('timer').textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+      
+      // Efeito de urgência nos últimos 30 segundos
+      if (gameState.tempoRestante <= 30) {
+        document.getElementById('timer').style.color = '#f00';
+        if (gameState.tempoRestante % 5 === 0) {
+          audioManager.play('timer-beep');
+        }
+      }
+      
+      if (gameState.tempoRestante <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timer').style.display = 'none';
+        gameState.timerAtivo = false;
+        
+        // Penalidade por não completar a tempo
+        adicionarMensagem("Sistema: TEMPO ESGOTADO! O fenômeno se fortalece...", true);
+        audioManager.play('grito');
+        atualizarSanidade(-30);
+        triggerRandomEvent();
+      }
+    }, 1000);
+  }
+
+  // Comandos Colaborativos
+  function verificarComandosColaborativos(comando) {
+    // Comando secreto que requer múltiplos jogadores
+    const comandosEspeciais = [
+      { cmd: "luzes acesas", threshold: 3, effect: () => {
+        adicionarMensagem("Sistema: Múltiplos usuários ativaram as luzes! O fenômeno recua temporariamente.", true);
+        audioManager.play('success');
+        atualizarSanidade(30);
+        atualizarProgresso(20);
+      }},
+      { cmd: "nino vai embora", threshold: 5, effect: () => {
+        adicionarMensagem("Sistema: VOCÊS NÃO DEVERIAM TER FEITO ISSO!", true);
+        audioManager.play('grito');
+        triggerRandomEvent();
+      }},
+      { cmd: "revelar verdade", threshold: 4, effect: () => {
+        if (gameState.nivel >= 3) {
+          adicionarMensagem("Sistema: A VERDADE É REVELADA... O nome original era ENRIQUE...", true);
+          gameState.nomeRealDescoberto = true;
+          audioManager.play('static');
+          atualizarSanidade(-20);
+        } else {
+          adicionarMensagem("Sistema: Vocês não estão preparados para a verdade...", true);
+          audioManager.play('grito');
+          atualizarSanidade(-15);
+        }
+      }}
+    ];
+    
+    comandosEspeciais.forEach(c => {
+      if (comando.toLowerCase().includes(c.cmd)) {
+        // Simular efeito colaborativo (em um sistema real, isso seria verificado no servidor)
+        if (Math.random() < 0.3) { // 30% de chance de ativar
+          c.effect();
+        }
+      }
+    });
+  }
+
+  // Funções de Final
+  function gameOver() {
+    adicionarMensagem("Fenômeno 1800: VOCÊ É MEU AGORA...", true);
+    audioManager.play('grito');
+    
+    setTimeout(() => {
+      document.body.innerHTML = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:red; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:100000;">
+          <h1>GAME OVER</h1>
+          <p>Sua sanidade chegou a zero</p>
+          <p>Tempo na sessão: ${Math.floor((new Date() - gameState.inicioSessao) / 60000)} minutos</p>
+          <p>Nível alcançado: ${gameState.nivel}</p>
+          <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:#111; color:red; border:1px solid red; cursor:pointer;">
+            Tentar Novamente
+          </button>
+        </div>
+      `;
+    }, 3000);
+  }
+
+  function quebrarRitual() {
+    // Determinar final com base nas ações
+    let final = 1; // Final básico
+    
+    if (gameState.criancasResgatadas > 0) {
+      final = 2; // Final de salvador
+    }
+    
+    if (gameState.acoesMorais < 0) {
+      final = 3; // Final de traidor
+    }
+    
+    if (gameState.documentosDesbloqueados >= 5) {
+      final = 4; // Final de pesquisador
+    }
+    
+    if (gameState.nomeRealDescoberto) {
+      final = 5; // Final secreto
+    }
+    
+    // Bônus por completar rápido
+    if (gameState.timerAtivo && gameState.tempoRestante > 120) {
+      final = 6; // Final especial por velocidade
+    }
+    
+    // Mostrar final apropriado
+    mostrarFinal(final);
+  }
+
+  function mostrarFinal(final) {
+    const finals = [
+      {
+        titulo: "FIM DO RITUAL",
+        mensagem: "Você quebrou o ritual, mas o fenômeno ainda está lá... esperando.",
+        cor: "#0f0"
+      },
+      {
+        titulo: "SALVADOR",
+        mensagem: `Você resgatou ${gameState.criancasResgatadas} crianças antes de quebrar o ritual. Elas estão a salvo... por enquanto.`,
+        cor: "#00f"
+      },
+      {
+        titulo: "TRAIDOR",
+        mensagem: "Você sacrificou outros para salvar a si mesmo. O fenômeno lembrará disso.",
+        cor: "#f00"
+      },
+      {
+        titulo: "PESQUISADOR",
+        mensagem: "Você descobriu a verdade por trás do fenômeno. Conhecimento é poder... e perigo.",
+        cor: "#ff0"
+      },
+      {
+        titulo: "O NOME VERDADEIRO",
+        mensagem: "Você pronunciou o nome proibido. Agora ele sabe que você sabe. Você nunca estará seguro.",
+        cor: "#8b0000"
+      },
+      {
+        titulo: "CAÇADOR RÁPIDO",
+        mensagem: "Você quebrou o ritual em tempo recorde! Mas será que ele realmente se foi?",
+        cor: "#ff00ff"
+      }
+    ];
+    
+    const finalEscolhido = finals[final - 1] || finals[0];
+    
+    adicionarMensagem(`O FENÔMENO COMEÇA A SE DESFAZER...`, true);
+    adicionarMensagem(`OS SÍMBOLOS NO CHÃO PERDEM SUA LUZ...`, true);
+    adicionarMensagem(`AS VOZES SE CALAM...`, true);
+    
+    setTimeout(() => {
+      document.body.innerHTML = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:${finalEscolhido.cor}; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:100000; text-align:center;">
+          <h1>${finalEscolhido.titulo}</h1>
+          <p>${finalEscolhido.mensagem}</p>
+          <p>Você usou o código: ${gameState.codigoQuebraRitual}</p>
+          <p>Tempo total: ${Math.floor((new Date() - gameState.inicioSessao) / 60000)} minutos</p>
+          <p>Nível alcançado: ${gameState.nivel}</p>
+          <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:#111; color:${finalEscolhido.cor}; border:1px solid ${finalEscolhido.cor}; cursor:pointer;">
+            Começar Novamente
+          </button>
+        </div>
+      `;
+    }, 4000);
+  }
+
+  // Sistema de Login
+  function entrarChat() {
+    const nomeInput = document.getElementById('nomeUsuario');
+    const nome = nomeInput.value.trim();
+    
+    if (nome) {
+      gameState.nomeUsuario = nome;
+      const motivo = motivosConvocacao[Math.floor(Math.random() * motivosConvocacao.length)];
+      const local = convocados.adicionar(nome, motivo);
+      
+      // Gera código secreto
+      const fragmentos = respostasFenomeno.fragmentos;
+      gameState.codigoQuebraRitual = [
+        fragmentos[Math.floor(Math.random() * fragmentos.length)],
+        fragmentos[Math.floor(Math.random() * fragmentos.length)],
+        fragmentos[Math.floor(Math.random() * fragmentos.length)]
+      ].join("-");
+      
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('chat').style.display = 'block';
+      
+      adicionarMensagem(`👁️‍🗨️ ${nome}, você foi convocado para ${local}...`, true);
+      adicionarMensagem(`Motivo: ${motivo}`, true);
+      
+      setTimeout(() => {
+        adicionarMensagem("Fenômeno 1800: ⚡... Estou vendo você...", true);
+        adicionarMensagem("Sistema: Algumas respostas podem conter fragmentos do código para quebrar o ritual...", false);
+      }, 2000);
+    } else {
+      nomeInput.style.border = "2px solid red";
+      setTimeout(() => {
+        nomeInput.style.border = "1px solid red";
+      }, 2000);
+    }
+  }
+
+  // Introdução
+  function mostrarIntroducao() {
+    const introText = document.getElementById('intro-text');
+    const textos = [
+      "> Arquivo #1800 carregado...",
+      "> Acessando registros classificados...",
+      "> Data do incidente: [REDACTED]",
+      "> Local: Estúdio de TV abandonado",
+      "> Vítimas: 300+ crianças desaparecidas",
+      "> Status do caso: ATIVO",
+      "> Última transmissão detectada: ONTEM",
+      " ",
+      "Você foi selecionado(a) para investigar o Fenômeno 1800.",
+      " ",
+      "NÃO OLHE NOS OLHOS DO BONECO.",
+      "NÃO PRONUNCIE O NOME DELE.",
+      "NÃO CONFIE NAS VOZES.",
+      " ",
+      "Sua missão: coletar fragmentos e quebrar o ritual.",
+      " ",
+      "> Digite seu nome para iniciar a sessão..."
+    ];
+    
+    let delay = 1000;
+    textos.forEach((texto, index) => {
+      setTimeout(() => {
+        const p = document.createElement('p');
+        p.className = 'typewriter';
+        p.style.animationDuration = `${Math.max(1000, texto.length * 50)}ms`;
+        p.textContent = texto;
+        introText.appendChild(p);
+        
+        if (index === textos.length - 1) {
+          setTimeout(() => {
+            document.getElementById('intro').style.display = 'none';
+          }, 3000);
+        }
+      }, delay);
+      delay += Math.max(1000, texto.length * 50) + 500;
+    });
+  }
+
+  // Funções para mostrar os painéis
+  function mostrarConvocados() {
+    const panel = document.getElementById('convocados-container');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function mostrarRituais() {
+    const panel = document.getElementById('rituais-container');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function mostrarCriancas() {
+    const panel = document.getElementById('criancas-container');
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      return;
+    }
+    
+    // Atualizar lista de crianças
+    const list = document.getElementById('criancas-list');
+    list.innerHTML = '';
+    
+    criancasDesaparecidas.forEach(crianca => {
+      const div = document.createElement('div');
+      div.className = 'missing-child';
+      div.innerHTML = `
+        <strong>${crianca.nome}</strong> (${crianca.idade} anos)<br>
+        Desaparecido em: ${crianca.desaparecimento}
+      `;
+      div.onclick = () => {
+        adicionarMensagem(`Sistema: Detalhes sobre ${crianca.nome}: ${crianca.detalhes}`, true);
+        if (crianca.resgatavel && Math.random() < 0.3) {
+          gameState.criancasResgatadas++;
+          adicionarMensagem(`Sistema: Você conseguiu resgatar ${crianca.nome}! (+10 sanidade)`, true);
+          atualizarSanidade(10);
+        }
+      };
+      list.appendChild(div);
+    });
+    
+    panel.style.display = 'block';
+  }
+
+  function mostrarDocumentos() {
+    const panel = document.getElementById('documentos-container');
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      return;
+    }
+    
+    // Atualizar lista de documentos
+    const list = document.getElementById('documentos-list');
+    list.innerHTML = '';
+    
+    documentosClassificados.slice(0, gameState.documentosDesbloqueados + 1).forEach(doc => {
+      const div = document.createElement('div');
+      div.className = 'document';
+      div.innerHTML = `<strong>${doc.titulo}</strong> (Nível ${doc.nivel})`;
+      div.onclick = () => {
+        adicionarMensagem(`Sistema: Documento ${doc.titulo}:\n${doc.conteudo}`, true);
+      };
+      list.appendChild(div);
+    });
+    
+    panel.style.display = 'block';
+  }
+
+  function tentarFugir() {
+    if (gameState.protecaoAtiva) {
+      adicionarMensagem("Sistema: Você não pode fugir enquanto a proteção estiver ativa!", true);
+      return;
+    }
+    
+    if (Math.random() < 0.3) {
+      adicionarMensagem("Sistema: Você conseguiu escapar temporariamente! (+20 sanidade)", true);
+      atualizarSanidade(20);
+    } else {
+      adicionarMensagem("Sistema: A fuga falhou! O fenômeno está mais agitado... (-15 sanidade)", true);
+      audioManager.play('grito');
+      atualizarSanidade(-15);
+      triggerRandomEvent();
+    }
+  }
+
+  function encerrarFenomeno() {
+    if (gameState.fragmentosColetados < 3) {
+      adicionarMensagem("Sistema: Você precisa coletar 3 fragmentos antes de tentar encerrar o fenômeno!", true);
+      return;
+    }
+    
+    adicionarMensagem("Sistema: Digite /quebrar CODIGO para tentar encerrar o fenômeno", true);
+    adicionarMensagem(`Exemplo: /quebrar ${respostasFenomeno.fragmentos[0]}-${respostasFenomeno.fragmentos[1]}-${respostasFenomeno.fragmentos[2]}`, true);
+  }
+
+  function triggerRandomEvent() {
+    if (gameState.protecaoAtiva) return;
+    
+    const eventos = [
+      () => {
+        adicionarMensagem("Sistema: Você ouve passos atrás de você...", true);
+        audioManager.play('sussurro');
+        atualizarSanidade(-5);
+      },
+      () => {
+        adicionarMensagem("Sistema: Algo arranhou a porta...", true);
+        audioManager.play('static');
+        atualizarSanidade(-8);
+      },
+      () => {
+        adicionarMensagem("Sistema: A temperatura caiu subitamente...", true);
+        atualizarSanidade(-3);
+      },
+      () => {
+        adicionarMensagem("Sistema: Você vê um vulto no canto do seu olho...", true);
+        audioManager.play('sussurro');
+        atualizarSanidade(-7);
+      },
+      () => {
+        adicionarMensagem("Sistema: O monitor piscou... você viu algo?", true);
+        audioManager.play('static');
+        atualizarSanidade(-4);
+      }
+    ];
+    
+    const eventoAleatorio = eventos[Math.floor(Math.random() * eventos.length)];
+    eventoAleatorio();
+  }
+
+  // Inicialização
+  function iniciarJogo() {
+    audioManager.carregarSons();
+    audioManager.sons.ambiente.play().catch(e => console.log("Áudio bloqueado:", e));
+    audioManager.playRandomStatic();
+    
+    mostrarIntroducao();
+    
+    // Diminui sanidade com o tempo
+    setInterval(() => {
+      if (!gameState.protecaoAtiva) {
+        atualizarSanidade(-1);
+      }
+    }, 60000);
+    
+    // Eventos aleatórios
+    setInterval(() => {
+      if (Math.random() < 0.3) {
+        triggerRandomEvent();
+      }
+    }, 120000);
+    
+    // Sussurros aleatórios
+    setInterval(() => {
+      if (gameState.sanidade < 50 && Math.random() < 0.2) {
+        audioManager.playRandomWhisper();
+      }
+    }, 30000);
+    
+    // Pop-ups de vídeo aleatórios
+    setInterval(() => {
+      if (Math.random() < 0.1) {
+        document.getElementById('transmissao').style.display = 'block';
+        const videos = [audioManager.videos.nino1, audioManager.videos.nino2];
+        const video = videos[Math.floor(Math.random() * videos.length)];
+        document.getElementById('transmissao-video').src = video.src;
+        
+        setTimeout(() => {
+          document.getElementById('transmissao').style.display = 'none';
+        }, 3000 + Math.random() * 2000);
+      }
+    }, 60000);
+    
+    // Efeito VHS em comandos específicos
+    const comandosComEfeitoVHS = ['nino', 'boneco', 'programa', '1800', 'ritual'];
+    document.getElementById('chatInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const msg = document.getElementById('chatInput').value.toLowerCase();
+        if (comandosComEfeitoVHS.some(cmd => msg.includes(cmd))) {
+          audioManager.play('vhs');
+        }
+      }
+    });
+  }
+
+  window.onload = iniciarJogo;
+  window.entrarChat = entrarChat;
+  window.enviarMensagem = enviarMensagem;
+  window.mostrarConvocados = mostrarConvocados;
+  window.mostrarRituais = mostrarRituais;
+  window.mostrarCriancas = mostrarCriancas;
+  window.mostrarDocumentos = mostrarDocumentos;
+  window.tentarFugir = tentarFugir;
+  window.ativarProtecao = ativarProtecao;
+  window.invocarEntidade = invocarEntidade;
+  window.encerrarFenomeno = encerrarFenomeno;
+  window.iniciarDesenho = iniciarDesenho;
+  window.iniciarRecitacao = iniciarRecitacao;
+</script>
+</body>
+</html>
