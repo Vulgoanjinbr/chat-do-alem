@@ -392,8 +392,6 @@
         max-height: 150px;
       }
     }
-
-    /* NOVOS ESTILOS ADICIONADOS */
     
     /* Barra de progresso animada */
     .progress-container {
@@ -532,11 +530,9 @@
   </style>
 </head>
 <body>
-  <!-- Efeitos Visuais -->
   <div class="crt-effect"></div>
   <div class="scanlines"></div>
   
-  <!-- Introdução -->
   <div id="intro" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#8b0000; padding:20px; z-index:9999; overflow-y:auto;">
     <h1 style="text-align:center; border-bottom:1px solid #8b0000; padding-bottom:10px;">RELATÓRIO 1800</h1>
     <div id="intro-text" style="margin-top:20px;">
@@ -544,17 +540,14 @@
     </div>
   </div>
 
-  <!-- Container do olho animado -->
   <div id="eye-container">
     <div class="eye"></div>
   </div>
 
-  <!-- Barra de Sanidade -->
   <div id="sanity-container">
     <div id="sanity-bar" title="Sanidade: 100%"></div>
   </div>
 
-  <!-- Elementos de feedback visual -->
   <div class="progress-container" id="progress-container">
     <div class="progress-bar" id="progress-bar"></div>
   </div>
@@ -569,19 +562,18 @@
   
   <div class="protection-effect" id="protection-effect"></div>
 
-  <!-- Transmissão -->
   <div id="transmissao">
     <video id="transmissao-video" autoplay loop muted></video>
   </div>
 
-  <!-- Login -->
+
   <div id="login">
     <p>IDENTIFICAÇÃO REQUERIDA</p>
     <input type="text" id="nomeUsuario" placeholder="Insira seu nome ou ID" />
     <button onclick="entrarChat()">ACESSAR SISTEMA</button>
   </div>
 
-  <!-- Chat Principal -->
+
   <div id="chat">
     <div id="chatMessages"></div>
     <input type="text" id="chatInput" placeholder="Digite sua mensagem..." />
@@ -593,13 +585,12 @@
     <button onclick="tentarFugir()">TENTAR FUGIR</button>
   </div>
   
-  <!-- Sistema de Convocados -->
   <div id="convocados-container" class="panel">
     <h3>LISTA DE CONVOCADOS</h3>
     <ul id="convocados-list"></ul>
   </div>
   
-  <!-- Sistema de Rituais -->
+
   <div id="rituais-container" class="panel">
     <h3>RITUAIS DISPONÍVEIS</h3>
     <div class="ritual-item" onclick="ativarProtecao()">VELAS DE PROTEÇÃO (5min)</div>
@@ -609,27 +600,27 @@
     <div class="ritual-item" onclick="iniciarRecitacao()">RECITAR FRASE</div>
   </div>
   
-  <!-- Crianças Desaparecidas -->
+ 
   <div id="criancas-container" class="panel">
     <h3>CRIANÇAS DESAPARECIDAS</h3>
     <div id="criancas-list"></div>
   </div>
   
-  <!-- Documentos Classificados -->
+
   <div id="documentos-container" class="panel">
     <h3>DOCUMENTOS CLASSIFICADOS</h3>
     <div id="documentos-list"></div>
   </div>
   
-  <!-- Vela de Proteção -->
+
   <div id="vela-protecao">
     <div id="vela-chama"></div>
   </div>
   
-  <!-- Canvas para desenhar símbolos -->
+
   <canvas id="drawing-canvas"></canvas>
   
-  <!-- Tela azul da morte -->
+
   <div id="blue-screen" class="blue-screen">
     <h1>ERRO CRÍTICO</h1>
     <p>O sistema encontrou um problema e precisa ser reiniciado.</p>
@@ -638,7 +629,7 @@
     <p id="blue-screen-percent">0% completo</p>
   </div>
 
-  <!-- Áudios -->
+
   <audio id="static" preload="auto"></audio>
   <audio id="sussurro" preload="auto"></audio>
   <audio id="grito" preload="auto"></audio>
@@ -646,13 +637,13 @@
   <audio id="ambiente" loop preload="auto"></audio>
   <audio id="choro" preload="auto"></audio>
   <audio id="vhs" preload="auto"></audio>
-  <!-- Novos efeitos sonoros -->
+
   <audio id="success" preload="auto"></audio>
   <audio id="combo" preload="auto"></audio>
   <audio id="timer-beep" preload="auto"></audio>
   <audio id="level-up" preload="auto"></audio>
   
-  <!-- Vídeos do Programa do Nino -->
+
   <video id="nino-video1" preload="auto" style="display:none;">
     <source src="https://assets.mixkit.co/videos/preview/mixkit-ghostly-figure-in-a-dark-forest-1582-large.mp4" type="video/mp4">
   </video>
@@ -661,7 +652,7 @@
   </video>
 
 <script>
-  // Banco de 200+ falas categorizadas
+  // Falas
   const respostasFenomeno = {
     nino: [
       "NINO... NINO... NINO... (voz distorcida)",
@@ -780,7 +771,7 @@
     ultimoAcerto: 0,
     comboAtivo: false,
     timerAtivo: false,
-    tempoRestante: 300, // 5 minutos em segundos
+    tempoRestante: 300, 
     progresso: 0,
     palavrasChave: ["nino", "boneco", "programa", "1800", "ritual", "sangue", "sal", "vela", "espelho", "símbolo"]
   };
@@ -908,7 +899,6 @@
       ambiente: document.getElementById('ambiente'),
       choro: document.getElementById('choro'),
       vhs: document.getElementById('vhs'),
-      // Novos sons
       success: document.getElementById('success'),
       combo: document.getElementById('combo'),
       timerBeep: document.getElementById('timer-beep'),
@@ -926,7 +916,6 @@
       this.sons.ambiente.src = 'https://assets.mixkit.co/sfx/preview/mixkit-horror-ambience-398.mp3';
       this.sons.choro.src = 'https://assets.mixkit.co/sfx/preview/mixkit-child-crying-493.mp3';
       this.sons.vhs.src = 'https://assets.mixkit.co/sfx/preview/mixkit-vhs-video-effect-2324.mp3';
-      // Carregar novos sons
       this.sons.success.src = 'https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3';
       this.sons.combo.src = 'https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkles-1681.mp3';
       this.sons.timerBeep.src = 'https://assets.mixkit.co/sfx/preview/mixkit-digital-clock-digital-alarm-buzzer-992.mp3';
@@ -1104,7 +1093,7 @@
     // Aumentar complexidade conforme o nível
     let respostasDisponiveis = [...respostasFenomeno[categoria] || [...respostasFenomeno.neutras]];
     
-    // No nível 3+, adicionar respostas mais complexas
+    // No nível 3+
     if (gameState.nivel >= 3) {
       respostasDisponiveis = respostasDisponiveis.concat([
         "O QUE VOCÊ REALMENTE SABE SOBRE O INCIDENTE DE 1992?",
@@ -1115,7 +1104,7 @@
       ]);
     }
     
-    // No nível 5+, adicionar respostas ainda mais perturbadoras
+    // No nível 5
     if (gameState.nivel >= 5) {
       respostasDisponiveis = respostasDisponiveis.concat([
         "VOCÊ SABE O QUE ACONTECEU COM O PRIMEIRO OPERADOR DE CÂMERA?",
@@ -1181,7 +1170,7 @@
       } else {
         setTimeout(() => {
           const categoria = analisarMensagem(msg);
-          if (categoria !== true) { // Se não foi um comando especial
+          if (categoria !== true) { 
             const resposta = gerarResposta(categoria);
             adicionarMensagem(resposta, categoria === 'ameacas' || categoria === 'nino');
             
@@ -1332,7 +1321,7 @@
     gameState.recitandoFrase = true;
     adicionarMensagem("Preparando reconhecimento de voz... Diga uma frase de proteção:", true);
     
-    // Simular reconhecimento de voz (navegador pode pedir permissão)
+    // Simular reconhecimento de voz (navegador pode pedir permissão) (não deu certo, mas sem isso da bug)
     setTimeout(() => {
       if (typeof SpeechRecognition === 'undefined' && typeof webkitSpeechRecognition === 'undefined') {
         // Fallback para navegadores sem suporte
@@ -1448,7 +1437,7 @@
     
     badge.textContent = `NÍVEL ${gameState.nivel} - ${titulos[Math.min(gameState.nivel-1, titulos.length-1)]}`;
     badge.style.animation = 'none';
-    void badge.offsetWidth; // Trigger reflow
+    void badge.offsetWidth; 
     badge.style.animation = 'titleFade 3s';
     
     audioManager.play('level-up');
@@ -1552,7 +1541,7 @@
     comandosEspeciais.forEach(c => {
       if (comando.toLowerCase().includes(c.cmd)) {
         // Simular efeito colaborativo (em um sistema real, isso seria verificado no servidor)
-        if (Math.random() < 0.3) { // 30% de chance de ativar
+        if (Math.random() < 0.3) { 
           c.effect();
         }
       }
